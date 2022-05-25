@@ -4,7 +4,6 @@ use serde::Serialize;
 use std::env;
 use std::sync::Mutex;
 
-
 #[get("/")]
 async fn index(data: web::Data<AppState>) -> String {
     let app_name = &data.app_name; // <- get app_name
@@ -74,7 +73,6 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(get_counter)
             .service(web::scope("/admin").service(get_admin))
-            
     })
     .workers(2)
     .bind((host, port))?
