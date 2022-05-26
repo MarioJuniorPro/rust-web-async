@@ -69,12 +69,12 @@ async fn main() -> std::io::Result<()> {
                 app_name: String::from("Actix Web"),
             }))
             .app_data(counter.clone())
-            .wrap(Logger::default())
+            // .wrap(Logger::default())
             .service(index)
             .service(get_counter)
             .service(web::scope("/admin").service(get_admin))
     })
-    .workers(2)
+    .workers(4)
     .bind((host, port))?
     .run()
     .await
