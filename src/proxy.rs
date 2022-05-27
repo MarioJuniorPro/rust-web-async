@@ -1,11 +1,10 @@
 use std::net::ToSocketAddrs;
 
-use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{error, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use awc::Client;
 use clap::Parser;
 
 use url::Url;
-
 
 #[derive(clap::Parser, Debug)]
 struct CliArguments {
@@ -49,7 +48,6 @@ async fn forward(
 
     Ok(client_resp.streaming(res))
 }
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

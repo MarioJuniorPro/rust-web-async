@@ -39,3 +39,6 @@ burst:
 burst2:
     wrk -t4 -c400 -d30s http://127.0.0.1:7778/    
 
+ping:
+    watch -n 5 -c 'curl localhost:7007/counter'
+

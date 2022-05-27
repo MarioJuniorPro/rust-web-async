@@ -1,8 +1,12 @@
 use actix_web::http::StatusCode;
-use actix_web::{get, middleware::Logger, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::middleware::Logger;
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+use db::db::{Database, Db};
 use serde::Serialize;
 use std::env;
 use std::sync::Mutex;
+
+mod db;
 
 #[get("/")]
 async fn index(data: web::Data<AppState>) -> String {
@@ -16,6 +20,15 @@ async fn get_counter(data: web::Data<AppStateWithCounter>) -> String {
     *counter += 1; // <- access counter inside MutexGuard
 
     format!("Request number: {counter}") // <- response with count
+}
+
+#[get("/db")]
+async fn get_db(data: web::Data<AppState>) -> String {
+    let app_name = &data.app_name; // <- get app_name
+    let mut db = data.db.clone();
+    
+    format!("Hello {app_name}! Database name: {}", db.get_database().unwrap())
+    // format!("Hello {app_name}!") 
 }
 
 #[derive(Debug, Serialize)]
@@ -36,6 +49,7 @@ async fn get_admin() -> impl Responder {
 
 struct AppState {
     app_name: String,
+    db: Database,
 }
 
 struct AppStateWithCounter {
@@ -67,11 +81,13 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(AppState {
                 app_name: String::from("Actix Web"),
+                db: Database::new("rust_db".to_string(), 1),
             }))
             .app_data(counter.clone())
-            // .wrap(Logger::default())
+            .wrap(Logger::default())
             .service(index)
             .service(get_counter)
+            .service(get_db)
             .service(web::scope("/admin").service(get_admin))
     })
     .workers(4)
